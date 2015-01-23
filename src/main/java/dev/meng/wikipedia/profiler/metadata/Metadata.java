@@ -97,8 +97,8 @@ public class Metadata {
             
             List<Map<File, Object>> updatedFiles = DB.METADATA.FILE.retrieveAll();
             Map<String, Integer> fileIdMap = new HashMap<>();
-            for(Map<File, Object> updatedFile : updatedFiles){
-                fileIdMap.put(updatedFile.get(File.LANG)+"/"+updatedFile.get(File.TITLE), (Integer) updatedFile.get(Page.ID));
+            for(Map<File, Object> updatedFile : updatedFiles){              
+                fileIdMap.put(updatedFile.get(File.LANG)+"/"+updatedFile.get(File.TITLE), (Integer) updatedFile.get(File.ID));
             }
             
 
@@ -111,7 +111,7 @@ public class Metadata {
                     revisionRecord.put(Revision.TIMESTAMP, revision.getTimestamp().getTimeInMillis());
                     revisionRecords.add(revisionRecord);
                 }
-                for(FileInfo file : page.getFiles()){
+                for(FileInfo file : page.getFiles()){                                  
                     int fileId = fileIdMap.get(file.getLang()+"/"+file.getTitle());
                     Map<PageFile, Object> pageFileRecord = new HashMap<>();
                     pageFileRecord.put(PageFile.PAGE_ID, pageId);
