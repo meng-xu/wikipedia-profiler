@@ -244,15 +244,17 @@ public class Metadata {
 
             JSONObject response = queryForJSONResponse(url);
             try {
-                JSONArray images = response.getJSONObject("query").getJSONObject("pages").getJSONObject(pageId).getJSONArray("images");
+                JSONObject pageRecord = response.getJSONObject("query").getJSONObject("pages").getJSONObject(pageId);
+                if(pageRecord.has("images")){
+                    JSONArray images = pageRecord.getJSONArray("images");
 
-                for(int i=0;i<images.length();i++){
-                    JSONObject image = images.getJSONObject(i);
-                    Map<String, Object> record = new HashMap<>();
-                    record.put("title", image.getString("title"));
-                    result.add(record);
+                    for(int i=0;i<images.length();i++){
+                        JSONObject image = images.getJSONObject(i);
+                        Map<String, Object> record = new HashMap<>();
+                        record.put("title", image.getString("title"));
+                        result.add(record);
+                    }
                 }
-                
                 String queryContinue = null;
                 if(response.has("query-continue")){
                     queryContinue = response.getJSONObject("query-continue").getJSONObject("images").getString("imcontinue");
@@ -411,26 +413,27 @@ public class Metadata {
 
             JSONObject response = queryForJSONResponse(url);
             try {
-                JSONArray revisions = response.getJSONObject("query").getJSONObject("pages").getJSONObject(pageId).getJSONArray("revisions");
+                JSONObject pageRecord = response.getJSONObject("query").getJSONObject("pages").getJSONObject(pageId);
+                if(pageRecord.has("revisions")){
+                    JSONArray revisions = pageRecord.getJSONArray("revisions");
 
-                for(int i=0;i<revisions.length();i++){
-                    JSONObject revision = revisions.getJSONObject(i);
-                    Map<String, Object> record = new HashMap<>();
-                    record.put("revid", Long.toString(revision.getLong("revid")));
-                    record.put("timestamp", StringUtils.parseTimestamp(revision.getString("timestamp"), Configure.METADATA.TIMESTAMP_FORMAT));
-                    result.add(record);
+                    for(int i=0;i<revisions.length();i++){
+                        JSONObject revision = revisions.getJSONObject(i);
+                        Map<String, Object> record = new HashMap<>();
+                        record.put("revid", Long.toString(revision.getLong("revid")));
+                        record.put("timestamp", StringUtils.parseTimestamp(revision.getString("timestamp"), Configure.METADATA.TIMESTAMP_FORMAT));
+                        result.add(record);
+                    }
                 }
-                
                 String queryContinue = null;
-                if(response.has("query-continue")){
+                if (response.has("query-continue")) {
                     queryContinue = response.getJSONObject("query-continue").getJSONObject("revisions").get("rvcontinue").toString();
                 }
-                
-                if(queryContinue!=null){
+
+                if (queryContinue != null) {
                     List<Map<String, Object>> moreResult = queryRevisionListWorker(lang, pageId, queryContinue, start, end);
                     result.addAll(moreResult);
                 }
-                
             } catch (Exception ex) {
                 LogHandler.log(this, LogLevel.WARN, "Error in response: " + urlString + ", " + response.toString() + ", " + ex.getMessage());
             }
